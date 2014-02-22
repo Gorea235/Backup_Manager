@@ -9,8 +9,8 @@ Imports System.Runtime.InteropServices
 ' Review the values of the assembly attributes
 
 <Assembly: AssemblyTitle("Backup_Manager")> 
-<Assembly: AssemblyDescription("")> 
-<Assembly: AssemblyCompany("")> 
+<Assembly: AssemblyDescription("Manages backups of folders and files")> 
+<Assembly: AssemblyCompany("Developers Prime")> 
 <Assembly: AssemblyProduct("Backup_Manager")> 
 <Assembly: AssemblyCopyright("Copyright ©  2014")> 
 <Assembly: AssemblyTrademark("")> 
