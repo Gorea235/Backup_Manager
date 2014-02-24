@@ -48,6 +48,8 @@ Partial Class Main
         Me.nud_minutesPast = New System.Windows.Forms.NumericUpDown()
         Me.Label6 = New System.Windows.Forms.Label()
         Me.btn_startBackup = New System.Windows.Forms.Button()
+        Me.btn_deleteBackup = New System.Windows.Forms.Button()
+        Me.ckbx_showWindow = New System.Windows.Forms.CheckBox()
         CType(Me.nud_interval, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.notifyIcon_menustrip.SuspendLayout()
         CType(Me.nud_previousQuantity, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -137,7 +139,7 @@ Partial Class Main
         'btn_saveChanges
         '
         Me.btn_saveChanges.Enabled = False
-        Me.btn_saveChanges.Location = New System.Drawing.Point(530, 337)
+        Me.btn_saveChanges.Location = New System.Drawing.Point(530, 364)
         Me.btn_saveChanges.Name = "btn_saveChanges"
         Me.btn_saveChanges.Size = New System.Drawing.Size(100, 70)
         Me.btn_saveChanges.TabIndex = 10
@@ -156,6 +158,7 @@ Partial Class Main
         '
         'secondThread
         '
+        Me.secondThread.WorkerReportsProgress = True
         '
         'notifyIcon_main
         '
@@ -218,6 +221,7 @@ Partial Class Main
         '
         'tmr_main
         '
+        Me.tmr_main.Enabled = True
         Me.tmr_main.Interval = 60000
         '
         'nud_minutesPast
@@ -241,18 +245,41 @@ Partial Class Main
         'btn_startBackup
         '
         Me.btn_startBackup.Enabled = False
-        Me.btn_startBackup.Location = New System.Drawing.Point(424, 337)
+        Me.btn_startBackup.Location = New System.Drawing.Point(424, 364)
         Me.btn_startBackup.Name = "btn_startBackup"
         Me.btn_startBackup.Size = New System.Drawing.Size(100, 70)
         Me.btn_startBackup.TabIndex = 18
         Me.btn_startBackup.Text = "Start Backup Now"
         Me.btn_startBackup.UseVisualStyleBackColor = True
         '
+        'btn_deleteBackup
+        '
+        Me.btn_deleteBackup.Enabled = False
+        Me.btn_deleteBackup.Location = New System.Drawing.Point(318, 364)
+        Me.btn_deleteBackup.Name = "btn_deleteBackup"
+        Me.btn_deleteBackup.Size = New System.Drawing.Size(100, 70)
+        Me.btn_deleteBackup.TabIndex = 19
+        Me.btn_deleteBackup.Text = "Delete Backup"
+        Me.btn_deleteBackup.UseVisualStyleBackColor = True
+        '
+        'ckbx_showWindow
+        '
+        Me.ckbx_showWindow.AutoSize = True
+        Me.ckbx_showWindow.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ckbx_showWindow.Location = New System.Drawing.Point(12, 413)
+        Me.ckbx_showWindow.Name = "ckbx_showWindow"
+        Me.ckbx_showWindow.Size = New System.Drawing.Size(176, 21)
+        Me.ckbx_showWindow.TabIndex = 20
+        Me.ckbx_showWindow.Text = "Show window on launch"
+        Me.ckbx_showWindow.UseVisualStyleBackColor = True
+        '
         'Main
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(642, 419)
+        Me.ClientSize = New System.Drawing.Size(642, 446)
+        Me.Controls.Add(Me.ckbx_showWindow)
+        Me.Controls.Add(Me.btn_deleteBackup)
         Me.Controls.Add(Me.btn_startBackup)
         Me.Controls.Add(Me.nud_minutesPast)
         Me.Controls.Add(Me.Label6)
@@ -275,6 +302,7 @@ Partial Class Main
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "Main"
+        Me.ShowInTaskbar = False
         Me.Text = "Backups"
         CType(Me.nud_interval, System.ComponentModel.ISupportInitialize).EndInit()
         Me.notifyIcon_menustrip.ResumeLayout(False)
@@ -308,5 +336,7 @@ Partial Class Main
     Friend WithEvents nud_minutesPast As System.Windows.Forms.NumericUpDown
     Friend WithEvents Label6 As System.Windows.Forms.Label
     Friend WithEvents btn_startBackup As System.Windows.Forms.Button
+    Friend WithEvents btn_deleteBackup As System.Windows.Forms.Button
+    Friend WithEvents ckbx_showWindow As System.Windows.Forms.CheckBox
 
 End Class
