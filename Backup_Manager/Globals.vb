@@ -20,7 +20,7 @@ Module Globals
         End Sub
     End Class
     Friend Class FileSize
-        Public size As UInteger
+        Public size As UInt16
         Public Sub AddBytes(ByVal bytes As UInteger)
 
         End Sub
