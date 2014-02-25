@@ -70,6 +70,7 @@ Public Class Main
     End Sub
 
     Friend Sub LoadBackups()
+        backups.Clear()
         For Each f In GetFiles(backupFilesLoc)
             If Microsoft.VisualBasic.Right(f, "4") = ".xml" Then
                 xDoc = XDocument.Load(f)
@@ -81,7 +82,6 @@ Public Class Main
                 Dim tmpPastVersions As String = xDoc...<PastVersionsToKeep>.Value
                 If tmpName <> "" And tmpOriginalLoc <> "" And tmpBackupLoc <> "" And tmpBackupInterval <> "" And tmpMinutePast <> "" And tmpPastVersions <> "" Then
                     backups.Add(tmpName, New BackupClass(tmpOriginalLoc, tmpBackupLoc, tmpBackupInterval, tmpMinutePast, tmpPastVersions))
-                    mainLogger.Log("Loaded backups into listbox")
                     mainLogger.Log("Loaded " & f & " as a backup xml file with data: Name=" & tmpName _
                                    & ",OriginalLocation=" & tmpOriginalLoc & ",BackupLocation=" & tmpBackupLoc & _
                                    ",BackupInterval=" & tmpBackupInterval & ",MinutePast=" & tmpMinutePast & _
@@ -97,6 +97,7 @@ Public Class Main
         For Each k In backups.Keys
             lbx_backups.Items.Add(k)
         Next
+        mainLogger.Log("Loaded backups into listbox")
     End Sub
 
     Friend Sub NewBackup(ByVal name As String, ByVal backupData As BackupClass)
@@ -268,7 +269,7 @@ Public Class Main
     End Function
 
     Public Function GetFileQuantityBySize(ByVal startingDir As String)
-        Dim fileSizes As UInt32 = 0
+        Dim fileSizes As UInt64 = 0
         Dim fileInfo As FileInfo
         For Each f In GetFiles(startingDir)
             fileInfo = GetFileInfo(f)
