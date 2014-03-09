@@ -34,7 +34,7 @@ Partial Class Main
         Me.tbx_bkupLoc = New System.Windows.Forms.TextBox()
         Me.Label4 = New System.Windows.Forms.Label()
         Me.btn_saveChanges = New System.Windows.Forms.Button()
-        Me.nud_interval = New System.Windows.Forms.NumericUpDown()
+        Me.nud_hours = New System.Windows.Forms.NumericUpDown()
         Me.secondThread = New System.ComponentModel.BackgroundWorker()
         Me.notifyIcon_main = New System.Windows.Forms.NotifyIcon(Me.components)
         Me.notifyIcon_menustrip = New System.Windows.Forms.ContextMenuStrip(Me.components)
@@ -45,15 +45,15 @@ Partial Class Main
         Me.nud_previousQuantity = New System.Windows.Forms.NumericUpDown()
         Me.Label5 = New System.Windows.Forms.Label()
         Me.tmr_main = New System.Windows.Forms.Timer(Me.components)
-        Me.nud_minutesPast = New System.Windows.Forms.NumericUpDown()
+        Me.nud_minutes = New System.Windows.Forms.NumericUpDown()
         Me.Label6 = New System.Windows.Forms.Label()
         Me.btn_startBackup = New System.Windows.Forms.Button()
         Me.btn_deleteBackup = New System.Windows.Forms.Button()
         Me.ckbx_showWindow = New System.Windows.Forms.CheckBox()
-        CType(Me.nud_interval, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.nud_hours, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.notifyIcon_menustrip.SuspendLayout()
         CType(Me.nud_previousQuantity, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.nud_minutesPast, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.nud_minutes, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'lbx_backups
@@ -134,7 +134,7 @@ Partial Class Main
         Me.Label4.Name = "Label4"
         Me.Label4.Size = New System.Drawing.Size(455, 20)
         Me.Label4.TabIndex = 9
-        Me.Label4.Text = "Backup Interval (hours):"
+        Me.Label4.Text = "Backup Interval (hours:minutes):"
         '
         'btn_saveChanges
         '
@@ -146,15 +146,15 @@ Partial Class Main
         Me.btn_saveChanges.Text = "Save Changes"
         Me.btn_saveChanges.UseVisualStyleBackColor = True
         '
-        'nud_interval
+        'nud_hours
         '
-        Me.nud_interval.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.nud_interval.Location = New System.Drawing.Point(178, 184)
-        Me.nud_interval.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
-        Me.nud_interval.Name = "nud_interval"
-        Me.nud_interval.Size = New System.Drawing.Size(452, 23)
-        Me.nud_interval.TabIndex = 11
-        Me.nud_interval.Value = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.nud_hours.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.nud_hours.Location = New System.Drawing.Point(178, 184)
+        Me.nud_hours.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.nud_hours.Name = "nud_hours"
+        Me.nud_hours.Size = New System.Drawing.Size(40, 23)
+        Me.nud_hours.TabIndex = 11
+        Me.nud_hours.Value = New Decimal(New Integer() {1, 0, 0, 0})
         '
         'secondThread
         '
@@ -205,7 +205,7 @@ Partial Class Main
         'nud_previousQuantity
         '
         Me.nud_previousQuantity.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.nud_previousQuantity.Location = New System.Drawing.Point(178, 282)
+        Me.nud_previousQuantity.Location = New System.Drawing.Point(178, 233)
         Me.nud_previousQuantity.Name = "nud_previousQuantity"
         Me.nud_previousQuantity.Size = New System.Drawing.Size(452, 23)
         Me.nud_previousQuantity.TabIndex = 15
@@ -213,7 +213,7 @@ Partial Class Main
         'Label5
         '
         Me.Label5.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label5.Location = New System.Drawing.Point(175, 259)
+        Me.Label5.Location = New System.Drawing.Point(175, 210)
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(455, 20)
         Me.Label5.TabIndex = 14
@@ -224,23 +224,24 @@ Partial Class Main
         Me.tmr_main.Enabled = True
         Me.tmr_main.Interval = 60000
         '
-        'nud_minutesPast
+        'nud_minutes
         '
-        Me.nud_minutesPast.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.nud_minutesPast.Location = New System.Drawing.Point(178, 233)
-        Me.nud_minutesPast.Maximum = New Decimal(New Integer() {59, 0, 0, 0})
-        Me.nud_minutesPast.Name = "nud_minutesPast"
-        Me.nud_minutesPast.Size = New System.Drawing.Size(452, 23)
-        Me.nud_minutesPast.TabIndex = 17
+        Me.nud_minutes.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.nud_minutes.Location = New System.Drawing.Point(242, 184)
+        Me.nud_minutes.Maximum = New Decimal(New Integer() {59, 0, 0, 0})
+        Me.nud_minutes.Name = "nud_minutes"
+        Me.nud_minutes.Size = New System.Drawing.Size(40, 23)
+        Me.nud_minutes.TabIndex = 17
         '
         'Label6
         '
-        Me.Label6.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label6.Location = New System.Drawing.Point(175, 210)
+        Me.Label6.AutoSize = True
+        Me.Label6.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label6.Location = New System.Drawing.Point(224, 186)
         Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(455, 20)
+        Me.Label6.Size = New System.Drawing.Size(12, 17)
         Me.Label6.TabIndex = 16
-        Me.Label6.Text = "Minutes past the hour to run backup:"
+        Me.Label6.Text = ":"
         '
         'btn_startBackup
         '
@@ -281,12 +282,12 @@ Partial Class Main
         Me.Controls.Add(Me.ckbx_showWindow)
         Me.Controls.Add(Me.btn_deleteBackup)
         Me.Controls.Add(Me.btn_startBackup)
-        Me.Controls.Add(Me.nud_minutesPast)
+        Me.Controls.Add(Me.nud_minutes)
         Me.Controls.Add(Me.Label6)
         Me.Controls.Add(Me.nud_previousQuantity)
         Me.Controls.Add(Me.Label5)
         Me.Controls.Add(Me.ckbx_startOnBoot)
-        Me.Controls.Add(Me.nud_interval)
+        Me.Controls.Add(Me.nud_hours)
         Me.Controls.Add(Me.btn_saveChanges)
         Me.Controls.Add(Me.Label4)
         Me.Controls.Add(Me.Label3)
@@ -304,10 +305,10 @@ Partial Class Main
         Me.Name = "Main"
         Me.ShowInTaskbar = False
         Me.Text = "Backups"
-        CType(Me.nud_interval, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.nud_hours, System.ComponentModel.ISupportInitialize).EndInit()
         Me.notifyIcon_menustrip.ResumeLayout(False)
         CType(Me.nud_previousQuantity, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.nud_minutesPast, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.nud_minutes, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -322,7 +323,7 @@ Partial Class Main
     Friend WithEvents tbx_bkupLoc As System.Windows.Forms.TextBox
     Friend WithEvents Label4 As System.Windows.Forms.Label
     Friend WithEvents btn_saveChanges As System.Windows.Forms.Button
-    Friend WithEvents nud_interval As System.Windows.Forms.NumericUpDown
+    Friend WithEvents nud_hours As System.Windows.Forms.NumericUpDown
     Friend WithEvents secondThread As System.ComponentModel.BackgroundWorker
     Friend WithEvents notifyIcon_main As System.Windows.Forms.NotifyIcon
     Friend WithEvents notifyIcon_menustrip As System.Windows.Forms.ContextMenuStrip
@@ -333,7 +334,7 @@ Partial Class Main
     Friend WithEvents nud_previousQuantity As System.Windows.Forms.NumericUpDown
     Friend WithEvents Label5 As System.Windows.Forms.Label
     Friend WithEvents tmr_main As System.Windows.Forms.Timer
-    Friend WithEvents nud_minutesPast As System.Windows.Forms.NumericUpDown
+    Friend WithEvents nud_minutes As System.Windows.Forms.NumericUpDown
     Friend WithEvents Label6 As System.Windows.Forms.Label
     Friend WithEvents btn_startBackup As System.Windows.Forms.Button
     Friend WithEvents btn_deleteBackup As System.Windows.Forms.Button

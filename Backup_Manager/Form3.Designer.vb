@@ -28,7 +28,7 @@ Partial Class ProgressForm
         Me.Label2 = New System.Windows.Forms.Label()
         Me.lbl_currentProccess = New System.Windows.Forms.Label()
         Me.Label3 = New System.Windows.Forms.Label()
-        Me.lbl_size = New System.Windows.Forms.Label()
+        Me.lbl_done = New System.Windows.Forms.Label()
         Me.Label5 = New System.Windows.Forms.Label()
         Me.SuspendLayout()
         '
@@ -74,9 +74,9 @@ Partial Class ProgressForm
         Me.lbl_currentProccess.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lbl_currentProccess.Location = New System.Drawing.Point(137, 38)
         Me.lbl_currentProccess.Name = "lbl_currentProccess"
-        Me.lbl_currentProccess.Size = New System.Drawing.Size(149, 17)
+        Me.lbl_currentProccess.Size = New System.Drawing.Size(215, 17)
         Me.lbl_currentProccess.TabIndex = 4
-        Me.lbl_currentProccess.Text = "Getting size of backup"
+        Me.lbl_currentProccess.Text = "Getting amount of files in backup"
         '
         'Label3
         '
@@ -84,19 +84,19 @@ Partial Class ProgressForm
         Me.Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Label3.Location = New System.Drawing.Point(12, 69)
         Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(39, 17)
+        Me.Label3.Size = New System.Drawing.Size(77, 17)
         Me.Label3.TabIndex = 5
-        Me.Label3.Text = "Size:"
+        Me.Label3.Text = "Files done:"
         '
-        'lbl_size
+        'lbl_done
         '
-        Me.lbl_size.AutoSize = True
-        Me.lbl_size.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lbl_size.Location = New System.Drawing.Point(57, 69)
-        Me.lbl_size.Name = "lbl_size"
-        Me.lbl_size.Size = New System.Drawing.Size(54, 17)
-        Me.lbl_size.TabIndex = 6
-        Me.lbl_size.Text = "0 bytes"
+        Me.lbl_done.AutoSize = True
+        Me.lbl_done.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lbl_done.Location = New System.Drawing.Point(95, 69)
+        Me.lbl_done.Name = "lbl_done"
+        Me.lbl_done.Size = New System.Drawing.Size(28, 17)
+        Me.lbl_done.TabIndex = 6
+        Me.lbl_done.Text = "0/0"
         '
         'Label5
         '
@@ -104,9 +104,9 @@ Partial Class ProgressForm
         Me.Label5.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Label5.Location = New System.Drawing.Point(12, 99)
         Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(164, 17)
+        Me.Label5.Size = New System.Drawing.Size(186, 17)
         Me.Label5.TabIndex = 10
-        Me.Label5.Text = "Progress (in size of files)"
+        Me.Label5.Text = "Progress (in amount of files)"
         '
         'ProgressForm
         '
@@ -115,7 +115,7 @@ Partial Class ProgressForm
         Me.ClientSize = New System.Drawing.Size(613, 159)
         Me.ControlBox = False
         Me.Controls.Add(Me.Label5)
-        Me.Controls.Add(Me.lbl_size)
+        Me.Controls.Add(Me.lbl_done)
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.lbl_currentProccess)
         Me.Controls.Add(Me.Label2)
@@ -136,6 +136,6 @@ Partial Class ProgressForm
     Friend WithEvents Label2 As System.Windows.Forms.Label
     Friend WithEvents lbl_currentProccess As System.Windows.Forms.Label
     Friend WithEvents Label3 As System.Windows.Forms.Label
-    Friend WithEvents lbl_size As System.Windows.Forms.Label
+    Friend WithEvents lbl_done As System.Windows.Forms.Label
     Friend WithEvents Label5 As System.Windows.Forms.Label
 End Class

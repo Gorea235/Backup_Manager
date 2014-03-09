@@ -3,32 +3,20 @@ Module Globals
     Friend Class BackupClass
         Public OriginalLoc As String
         Public BackupLoc As String
-        Public BackupInverval As Integer
-        Public CurrentInterval As Integer
-        Public MinutePast As Byte
-        Public PastVersions As Integer
+        Public BackupInvervalHour As UInt32
+        Public BackupInvervalMinute As UInt32
+        Public CurrentIntervalHour As UInt32
+        Public CurrentIntervalMinute As UInt32
+        Public PastVersions As UInt32
 
-        Public Sub New(ByVal sOriginalLoc As String, ByVal sBackupLoc As String, ByVal iBackupInterval As Integer, ByVal iMinutePast As Byte, ByVal iPastVersions As Integer)
-            If iMinutePast > 59 Then
-                Throw New InvalidConstraintException("Minute cannot be above 59")
-            End If
+        Public Sub New(ByVal sOriginalLoc As String, ByVal sBackupLoc As String, ByVal iBackupIntervalHour As UInt32, ByVal iBackupIntervalMinute As UInt32, ByVal iPastVersions As UInt32, ByVal iCurrentIntervalHour As UInt32, ByVal iCurrentIntervalMinute As UInt32)
             Me.OriginalLoc = sOriginalLoc
             Me.BackupLoc = sBackupLoc
-            Me.BackupInverval = iBackupInterval
-            Me.MinutePast = iMinutePast
+            Me.BackupInvervalHour = iBackupIntervalHour
+            Me.BackupInvervalMinute = iBackupIntervalMinute
             Me.PastVersions = iPastVersions
-        End Sub
-    End Class
-    Friend Class FileSize
-        Public size As UInt16
-        Public Sub AddBytes(ByVal bytes As UInteger)
-
-        End Sub
-
-        Public Sub RemoveBytes(ByVal bytes As UInteger)
-            If bytes > size Then
-                Throw New ArithmeticException("Bytes cannot go below 0")
-            End If
+            Me.CurrentIntervalHour = iCurrentIntervalHour
+            Me.CurrentIntervalMinute = iCurrentIntervalMinute
         End Sub
     End Class
     Friend Const mainDir As String = "C:/Backup_Manager/"
@@ -44,6 +32,11 @@ Module Globals
     Friend secondaryLogger As New Logger.Logger(LogLoc, "Secondary Thread: ")
     Friend backingup As Boolean = False
     Friend backups As Dictionary(Of String, BackupClass) = New Dictionary(Of String, BackupClass)
+    Friend tmr_timer As New Timer
+
+    Sub New()
+        tmr_timer.Enabled = False
+    End Sub
 
     Friend Sub SaveOptions()
         xDoc = New XDocument(New XElement("Options", _
@@ -73,7 +66,25 @@ Module Globals
         Main.Close()
     End Sub
 
-    Public Function GetLocalPath(ByVal location As String, ByVal actualDir As String)
+    Function GetLocalPath(ByVal location As String, ByVal actualDir As String)
         Return Right(location, location.Length - actualDir.Length)
     End Function
+
+    Friend Sub UpdateApp()
+        Main.Update()
+        BackupAdder.Update()
+        ProgressForm.Update()
+        BackupSelector.Update()
+        Application.DoEvents()
+    End Sub
+
+    Friend Sub wait(ByVal milliseconds As UInt32)
+        Dim sw As New Stopwatch
+        sw.Reset()
+        sw.Start()
+        While sw.ElapsedMilliseconds < milliseconds
+            UpdateApp()
+        End While
+        sw.Stop()
+    End Sub
 End Module
