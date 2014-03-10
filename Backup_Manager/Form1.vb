@@ -227,79 +227,94 @@ Public Class Main
         secondaryLogger.Log("Loaded size of backup, " & amount & " to backup")
         Dim amountDone As New UInt32
         secondThread.ReportProgress(0, {"proccess", "Backing up files"})
-        BackupFolder(args.originalLoc, args.backupLoc, args.pastVersions, amount, amountDone)
+        BackupFolder(args.originalLoc, args.backupLoc, args.pastVersions, amount)
     End Sub
 
-    Private Function BackupFolder(ByVal originalLoc As String, ByVal backupLoc As String, ByVal pastVersions As Integer, ByVal amount As UInt32, ByVal amountDone As UInt32) As Single
+    Private Function BackupFolder(ByVal originalLoc As String, ByVal backupLoc As String, ByVal pastVersions As Integer, ByVal amount As UInt32) As Single
         Dim file1 As FileInfo
         Dim file2 As FileInfo
         Dim filebk As String = ""
-        If Not DirectoryExists(backupLoc) Then
-            CreateDirectory(backupLoc)
-        End If
-        For Each f In GetFiles(originalLoc)
-            filebk = backupLoc & GetLocalPath(f, originalLoc)
-            file1 = New FileInfo(f)
-            file2 = New FileInfo(filebk)
-            If FileExists(filebk) Then
-                If file1.LastWriteTime <> file2.LastWriteTime Then
-                    Try
-                        If pastVersions = 0 Then
-                            DeleteFile(filebk)
-                            CopyFile(f, filebk)
-                        Else
-                            If FileExists(filebk & ".backup" & pastVersions) Then
-                                DeleteFile(filebk & ".backup" & pastVersions)
-                            End If
-                            If pastVersions > 1 Then
-                                For i = pastVersions - 1 To 1 Step -1
-                                    If FileExists(filebk & ".backup" & i) Then
-                                        DeleteFile(filebk & ".backup" & i)
-                                    End If
-                                    If FileExists(filebk & ".backup" & (i - 1)) Then
-                                        CopyFile(filebk & ".backup" & (i - 1), filebk & ".backup" & i)
-                                    End If
-                                Next
-                            End If
-                            If FileExists(filebk) Then
-                                CopyFile(filebk, filebk & ".backup" & 1)
-                            End If
-                        End If
-                        secondaryLogger.Log("Backed up " & f & " to " & filebk)
-                    Catch ex As Exception
-                        secondaryLogger.Log("Didn't back up " & f & ", reason = " & ex.Message)
-                    End Try
-                Else
-                    secondaryLogger.Log("Didn't back up " & f & ", reason = not changed")
-                End If
-            Else
-                CopyFile(f, filebk)
-                secondaryLogger.Log("Backed up " & f & " to " & filebk)
+        Dim amountDone As UInt32
+        Dim dirs As New Stack(Of String)
+        Dim origDir As String = ""
+        Dim backDir As String = ""
+        dirs.Push(originalLoc)
+        While dirs.Count > 0
+            origDir = dirs.Pop()
+            backDir = backupLoc & GetLocalPath(origDir, originalLoc)
+            If Not DirectoryExists(backDir) Then
+                CreateDirectory(backDir)
             End If
-            amountDone += 1
-            secondaryLogger.Log("amountDone=" & amountDone & ",amount=" & amount)
-            UpdateQuantityLabel(Math.Round(amountDone / amount * 100, 2), amountDone, amount)
-        Next
-        For Each d In GetDirectories(originalLoc)
-            amountDone = BackupFolder(d, backupLoc & GetLocalPath(d, originalLoc), pastVersions, amount, amountDone)
-        Next
+            For Each f In GetFiles(origDir)
+                filebk = backDir & GetLocalPath(f, origDir)
+                file1 = New FileInfo(f)
+                file2 = New FileInfo(filebk)
+                If FileExists(filebk) Then
+                    If file1.LastWriteTime <> file2.LastWriteTime Then
+                        Try
+                            If pastVersions = 0 Then
+                                DeleteFile(filebk)
+                                CopyFile(f, filebk)
+                            Else
+                                If FileExists(filebk & ".backup" & pastVersions) Then
+                                    DeleteFile(filebk & ".backup" & pastVersions)
+                                End If
+                                If pastVersions > 1 Then
+                                    For i = pastVersions - 1 To 1 Step -1
+                                        If FileExists(filebk & ".backup" & i) Then
+                                            DeleteFile(filebk & ".backup" & i)
+                                        End If
+                                        If FileExists(filebk & ".backup" & (i - 1)) Then
+                                            CopyFile(filebk & ".backup" & (i - 1), filebk & ".backup" & i)
+                                        End If
+                                    Next
+                                End If
+                                If FileExists(filebk) Then
+                                    CopyFile(filebk, filebk & ".backup" & 1)
+                                End If
+                            End If
+                            secondaryLogger.Log("Backed up " & f & " to " & filebk)
+                        Catch ex As Exception
+                            secondaryLogger.Log("Didn't back up " & f & ", reason = " & ex.Message)
+                        End Try
+                    Else
+                        secondaryLogger.Log("Didn't back up " & f & ", reason = not changed")
+                    End If
+                Else
+                    CopyFile(f, filebk)
+                    secondaryLogger.Log("Backed up " & f & " to " & filebk)
+                End If
+                amountDone += 1
+                secondaryLogger.Log("amountDone=" & amountDone & ",amount=" & amount)
+                UpdateQuantityLabel(Math.Round(amountDone / amount * 100, 2), amountDone, amount)
+            Next
+            For Each d In GetDirectories(origDir)
+                dirs.Push(d)
+            Next
+        End While
         Return amountDone
     End Function
 
-    Public Function GetFileQuantity(ByVal startingDir As String, Optional ByVal startingValue As UInt32 = 0)
-        Dim files As Single = startingValue
-        For Each f In GetFiles(startingDir)
-            files += 1
-            UpdateQuantityLabel(0, 0, files)
-        Next
-        For Each d In GetDirectories(startingDir)
-            files = GetFileQuantity(d, files)
-        Next
+    Public Function GetFileQuantity(ByVal startingDir As String)
+        Dim files As UInt32 = 0
+        Dim dirs As New Stack(Of String)
+        Dim dir As String
+        dirs.Push(startingDir)
+        While dirs.Count > 0
+            dir = dirs.Pop()
+            For Each f In GetFiles(dir)
+                files += 1
+                UpdateQuantityLabel(0, 0, files)
+            Next
+            For Each d In GetDirectories(dir)
+                dirs.Push(d)
+            Next
+        End While
         Return files
     End Function
 
     Private Sub UpdateQuantityLabel(ByVal percent As Byte, ByVal done As UInt32, ByVal amount As UInt32)
-        secondThread.ReportProgress(percent, {"amount", done & "/" & amount})
+        secondThread.ReportProgress(percent, {"amount", done.ToString & "/" & amount.ToString})
     End Sub
 
 #Region "Depreciated size-get functions"
