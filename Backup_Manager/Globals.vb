@@ -33,6 +33,9 @@ Module Globals
     Friend backingup As Boolean = False
     Friend backups As Dictionary(Of String, BackupClass) = New Dictionary(Of String, BackupClass)
     Friend tmr_timer As New Timer
+    
+    Declare Function AllocConsole Lib "kernel32" () As Integer
+    Declare Function FreeConsole Lib "kernel32" () As Integer
 
     Sub New()
         tmr_timer.Enabled = False
