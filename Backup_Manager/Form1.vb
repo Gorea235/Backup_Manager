@@ -4,11 +4,13 @@ Imports IWshRuntimeLibrary
 Imports System.Environment
 Public Class Main
     Private Class queueClass
+        Public name As String
         Public originalLoc As String
         Public backupLoc As String
         Public pastVersions As Integer
 
-        Public Sub New(ByVal OriginalLocation As String, ByVal BackupLocation As String, ByVal VersionsToKeep As Integer)
+        Public Sub New(ByVal Name As String, ByVal OriginalLocation As String, ByVal BackupLocation As String, ByVal VersionsToKeep As Integer)
+            Me.name = Name
             Me.originalLoc = OriginalLocation
             Me.backupLoc = BackupLocation
             Me.pastVersions = VersionsToKeep
@@ -63,6 +65,15 @@ Public Class Main
                 MainShort.TargetPath = Application.ExecutablePath
                 MainShort.IconLocation = Application.ExecutablePath & ", 0"
                 MainShort.Save()
+            Else
+                Dim shl = New Shell32.Shell()
+                Dim dir = shl.[NameSpace](System.IO.Path.GetDirectoryName(shortLocation))
+                Dim itm = dir.Items().Item(System.IO.Path.GetFileName(shortLocation))
+                Dim lnk = DirectCast(itm.GetLink, Shell32.ShellLinkObject)
+                If lnk.Path <> Application.ExecutablePath Then
+                    DeleteFile(shortLocation)
+                    CheckShortCut()
+                End If
             End If
         Else
             If FileExists(shortLocation) Then
@@ -84,13 +95,14 @@ Public Class Main
                 Dim tmpCurrentIntervalHour As String = xDoc...<CurrentIntervalHour>.Value
                 Dim tmpCurrentIntervalMinute As String = xDoc...<CurrentIntervalMinute>.Value
                 Dim tmpPastVersions As String = xDoc...<PastVersionsToKeep>.Value
-                If tmpName <> "" And tmpOriginalLoc <> "" And tmpBackupLoc <> "" And tmpBackupIntervalHour <> "" And tmpBackupIntervalMinute <> "" And tmpCurrentIntervalHour <> "" And tmpCurrentIntervalMinute <> "" And tmpPastVersions <> "" Then
-                    backups.Add(tmpName, New BackupClass(tmpOriginalLoc, tmpBackupLoc, tmpBackupIntervalHour, tmpBackupIntervalMinute, tmpPastVersions, tmpCurrentIntervalHour, tmpCurrentIntervalMinute))
+                Dim tmpManual As String = xDoc...<Manual>.Value
+                If tmpName <> "" And tmpOriginalLoc <> "" And tmpBackupLoc <> "" And tmpBackupIntervalHour <> "" And tmpBackupIntervalMinute <> "" And tmpCurrentIntervalHour <> "" And tmpCurrentIntervalMinute <> "" And tmpPastVersions <> "" And tmpManual <> "" Then
+                    backups.Add(tmpName, New BackupClass(tmpOriginalLoc, tmpBackupLoc, tmpBackupIntervalHour, tmpBackupIntervalMinute, tmpPastVersions, tmpCurrentIntervalHour, tmpCurrentIntervalMinute, tmpManual))
                     mainLogger.Log("Loaded " & f & " as a backup xml file with data: Name=" & tmpName _
                                    & ",OriginalLocation=" & tmpOriginalLoc & ",BackupLocation=" & tmpBackupLoc & _
                                    ",BackupInterval=" & tmpBackupIntervalHour & ",PastVersions=" & tmpPastVersions & _
                                    ",CurrentIntervalHour=" & tmpCurrentIntervalHour & _
-                                   ",CurrentIntervalMinute=" & tmpCurrentIntervalMinute)
+                                   ",CurrentIntervalMinute=" & tmpCurrentIntervalMinute & ",Manual=" & tmpManual)
                 Else
                     mainLogger.Log("|" & f & "| wasn't loaded due to having an incorrect element struture")
                 End If
@@ -111,7 +123,7 @@ Public Class Main
                        ",OriginalLocation=" & backupData.OriginalLoc & ",BackupLocation=" & backupData.BackupLoc & _
                        ",BackupIntervalHour=" & backupData.BackupInvervalHour & ",BackupIntervalMinute=" & backupData.BackupInvervalMinute & _
                        ",PastVersions=" & backupData.PastVersions & ",CurrentIntervalHour=" & backupData.CurrentIntervalHour & _
-                       ",CurrentIntervalMinute=" & backupData.CurrentIntervalMinute)
+                       ",CurrentIntervalMinute=" & backupData.CurrentIntervalMinute & ",Manual=" & backupData.Manual)
         LoadBackups()
     End Sub
 
@@ -125,7 +137,7 @@ Public Class Main
                            ",OriginalLocation=" & backupData.OriginalLoc & ",BackupLocation=" & backupData.BackupLoc & _
                            ",BackupIntervalHour=" & backupData.BackupInvervalHour & ",BackupIntervalMinute=" & backupData.BackupInvervalMinute & _
                            ",PastVersions=" & backupData.PastVersions & ",CurrentIntervalHour=" & backupData.CurrentIntervalHour & _
-                           ",CurrentIntervalMinute=" & backupData.CurrentIntervalMinute)
+                           ",CurrentIntervalMinute=" & backupData.CurrentIntervalMinute & ",Manual=" & backupData.Manual)
         End If
     End Sub
 
@@ -138,7 +150,8 @@ Public Class Main
                                           New XElement("BackupIntervalMinute", backupData.BackupInvervalMinute), _
                                           New XElement("CurrentIntervalHour", backupData.CurrentIntervalHour), _
                                           New XElement("CurrentIntervalMinute", backupData.CurrentIntervalMinute), _
-                                          New XElement("PastVersionsToKeep", backupData.PastVersions) _
+                                          New XElement("PastVersionsToKeep", backupData.PastVersions), _
+                                          New XElement("Manual", backupData.Manual) _
                                           ))
         xDoc.Save(backupFilesLoc & "backup_" & name & ".xml")
     End Sub
@@ -177,20 +190,22 @@ Public Class Main
         Dim keys As String() = backups.Keys.ToArray
         For Each k In keys
             Dim v As BackupClass = backups(k)
-            v.CurrentIntervalMinute += 1
-            If v.CurrentIntervalMinute = 60 Then
-                v.CurrentIntervalMinute = 0
-                v.CurrentIntervalHour += 1
+            If Not v.Manual Then
+                v.CurrentIntervalMinute += 1
+                If v.CurrentIntervalMinute = 60 Then
+                    v.CurrentIntervalMinute = 0
+                    v.CurrentIntervalHour += 1
+                End If
+                mainLogger.Log("Increased CurrentInvervalMinute on backup " & k & " (to " & v.CurrentIntervalMinute & "), CurrentIntervalHour = " & v.CurrentIntervalHour)
+                If v.CurrentIntervalMinute = v.BackupInvervalMinute And v.CurrentIntervalHour = v.BackupInvervalHour Then
+                    QueueBackup(k, v.OriginalLoc, v.BackupLoc, v.PastVersions)
+                    v.CurrentIntervalHour = 0
+                    v.CurrentIntervalMinute = 0
+                    mainLogger.Log("Queued backup '" & k & "'")
+                End If
+                backups(k) = v
+                SaveBackup(k, v, False)
             End If
-            mainLogger.Log("Increased CurrentInvervalMinute on backup " & k & " (to " & v.CurrentIntervalMinute & "), CurrentIntervalHour = " & v.CurrentIntervalHour)
-            If v.CurrentIntervalMinute = v.BackupInvervalMinute And v.CurrentIntervalHour = v.BackupInvervalHour Then
-                QueueBackup(v.OriginalLoc, v.BackupLoc, v.PastVersions)
-                v.CurrentIntervalHour = 0
-                v.CurrentIntervalMinute = 0
-                mainLogger.Log("Queued backup " & k)
-            End If
-            backups(k) = v
-            SaveBackup(k, v, False)
         Next
     End Sub
 
@@ -198,8 +213,8 @@ Public Class Main
         BackupAdder.Show()
     End Sub
 
-    Public Sub QueueBackup(ByVal originalLoc As String, ByVal backupLoc As String, ByVal pastVersions As Integer)
-        queued.Add(queued.Count, New queueClass(originalLoc, backupLoc, pastVersions))
+    Public Sub QueueBackup(ByVal name As String, ByVal originalLoc As String, ByVal backupLoc As String, ByVal pastVersions As Integer)
+        queued.Add(queued.Count, New queueClass(name, originalLoc, backupLoc, pastVersions))
         mainLogger.Log("Backup added to queue list")
         If Not secondThread.IsBusy Then
             StartBackups()
@@ -223,36 +238,45 @@ Public Class Main
             Exit Sub
         End Try
         secondThread.ReportProgress(0, {"proccess", "Getting amount of files in backup"})
-        Dim files as Stack(Of String) = GetFileQuantity(args.originalLoc)
+        secondThread.ReportProgress(0, {"current", args.name})
+        Dim seconds As UInt32 = 0
+        Dim files As Stack(Of String) = GetFileQuantity(args.originalLoc, seconds)
         Dim amount As UInt32 = files.Count
-        secondaryLogger.Log("Loaded size of backup, " & amount & " to backup")
+        secondaryLogger.Log("Loaded size of backup, " & amount & " files to backup")
         Dim amountDone As New UInt32
         secondThread.ReportProgress(0, {"proccess", "Backing up files"})
-        BackupFolder(args.originalLoc, args.backupLoc, args.pastVersions, amount, files)
+        secondaryLogger.Log("Starting backup process with backup data '" & args.name & "'")
+        e.Result = BackupFolder(args.originalLoc, args.backupLoc, args.pastVersions, amount, files) + seconds
     End Sub
 
-    Private Sub BackupFolder(ByVal originalLoc As String, ByVal backupLoc As String, ByVal pastVersions As Integer, ByVal amount As UInt32, ByVal files as Stack(Of String) As Single
+    Private Function BackupFolder(ByVal originalLoc As String, ByVal backupLoc As String, ByVal pastVersions As Integer, ByVal amount As UInt32, ByVal files As Stack(Of String))
         Dim file1 As FileInfo
         Dim file2 As FileInfo
         Dim filebk As String = ""
         Dim amountDone As UInt32
-        Dim origDir As String = ""
+        Dim origFile As String = ""
         Dim backDir As String = ""
+        Dim skips As UInt32 = 0
+        Dim copies As UInt32 = 0
+        Dim errors As UInt32 = 0
+        Dim stopwatch As New Stopwatch
+        stopwatch.Restart()
         While files.Count > 0
-            origDir = files.Pop()
-            backDir = backupLoc & GetLocalPath(origDir, originalLoc)
+            origFile = files.Pop()
+            file1 = New FileInfo(origFile)
+            backDir = backupLoc & GetLocalPath(file1.DirectoryName, originalLoc)
             If Not DirectoryExists(backDir) Then
                 CreateDirectory(backDir)
             End If
-            filebk = backDir & GetLocalPath(f, origDir)
-            file1 = New FileInfo(f)
+            filebk = backDir & GetLocalPath(origFile, file1.DirectoryName)
             file2 = New FileInfo(filebk)
             If FileExists(filebk) Then
                 If file1.LastWriteTime <> file2.LastWriteTime Then
                     Try
                         If pastVersions = 0 Then
                             DeleteFile(filebk)
-                            CopyFile(f, filebk)
+                            CopyFile(origFile, filebk)
+                            copies += 1
                         Else
                             If FileExists(filebk & ".backup" & pastVersions) Then
                                 DeleteFile(filebk & ".backup" & pastVersions)
@@ -269,53 +293,66 @@ Public Class Main
                             End If
                             If FileExists(filebk) Then
                                 CopyFile(filebk, filebk & ".backup" & 1)
+                                copies += 1
                             End If
                         End If
-                        secondaryLogger.Log("Backed up " & f & " to " & filebk)
+                        'secondaryLogger.Log("Backed up " & origFile & " to " & filebk)
                     Catch ex As Exception
-                        secondaryLogger.Log("Didn't back up " & f & ", reason = " & ex.Message)
+                        errors += 1
+                        secondaryLogger.Log("Didn't back up " & origFile & ", reason = " & ex.Message)
                     End Try
                 Else
-                    secondaryLogger.Log("Didn't back up " & f & ", reason = not changed")
+                    skips += 1
+                    'secondaryLogger.Log("Didn't back up " & origFile & ", reason = not changed")
                 End If
             Else
-                CopyFile(f, filebk)
-                secondaryLogger.Log("Backed up " & f & " to " & filebk)
+                CopyFile(origFile, filebk)
+                copies += 1
+                'secondaryLogger.Log("Backed up " & origFile & " to " & filebk)
             End If
             amountDone += 1
-            secondaryLogger.Log("amountDone=" & amountDone & ",amount=" & amount)
+            'secondaryLogger.Log("amountDone=" & amountDone & ",amount=" & amount)
             UpdateQuantityLabel(Math.Round(amountDone / amount * 100, 2), amountDone, amount)
         End While
+        stopwatch.Stop()
+        secondaryLogger.Log("Backup process complete with " & copies & " copies, " & skips & " skips and " & errors & " errors, with a total of " & amountDone & " / " & amount & " files checked in " & (stopwatch.ElapsedMilliseconds / 1000) & " seconds")
+        Return (stopwatch.ElapsedMilliseconds / 1000)
     End Function
 
-    Public Function GetFileQuantity(ByVal startingDir As String)
+    Public Function GetFileQuantity(ByVal startingDir As String, ByRef seconds As UInt32)
         Dim files As New Stack(Of String)
         Dim dirs As New Stack(Of String)
         Dim dir As String
+        Dim stopwatch As New Stopwatch
         dirs.Push(startingDir)
+        secondaryLogger.Log("Getting all files in " & startingDir)
+        stopwatch.Restart()
         While dirs.Count > 0
             dir = dirs.Pop()
-                For Each f In GetFiles(dir)
-                    Try
-                        files.Push(f)
-                        UpdateQuantityLabel(0, 0, files.Count)
-                    Catch ex As Exception
-                        secondaryLoggger.Log("Error occured when adding file " & f & " to stack")
-                    End Try
-                Next
-                For Each d In GetDirectories(dir)
-                    Try
-                        dirs.Push(d)
-                    Catch ex As Exception
-                        secondaryLoggger.Log("Error occured when adding directory " & d & " to stack")
-                    End Try
-                Next
+            For Each f In GetFiles(dir)
+                Try
+                    files.Push(f)
+                    UpdateQuantityLabel(0, 0, files.Count)
+                Catch ex As Exception
+                    secondaryLogger.Log("Error occured when adding file " & f & " to stack")
+                End Try
+            Next
+            For Each d In GetDirectories(dir)
+                Try
+                    dirs.Push(d)
+                Catch ex As Exception
+                    secondaryLogger.Log("Error occured when adding directory " & d & " to stack")
+                End Try
+            Next
         End While
+        stopwatch.Stop()
+        seconds = (stopwatch.ElapsedMilliseconds / 1000)
+        secondaryLogger.Log("Got all files in '" & startingDir & "' in " & seconds & " seconds")
         Return files
     End Function
 
     Private Sub UpdateQuantityLabel(ByVal percent As Byte, ByVal done As UInt32, ByVal amount As UInt32)
-        secondThread.ReportProgress(percent, {"amount", done.ToString & "/" & amount.ToString})
+        secondThread.ReportProgress(percent, {"amount", done.ToString("n0") & "/" & amount.ToString("n0")})
     End Sub
 
 #Region "Depreciated size-get functions"
@@ -362,25 +399,34 @@ Public Class Main
 #End Region
 
     Private Sub secondThread_ReportProgress(sender As Object, e As System.ComponentModel.ProgressChangedEventArgs) Handles secondThread.ProgressChanged
-        If e.ProgressPercentage > 0 Then
-            ProgressForm.prog_backupProg.Value = e.ProgressPercentage
-        End If
-        If Not IsNothing(e.UserState) Then
-            Dim userState As String() = e.UserState
-            If userState(0) = "proccess" Then
-                ProgressForm.lbl_currentProccess.Text = userState(1)
-            ElseIf userState(0) = "amount" Then
-                ProgressForm.lbl_done.Text = userState(1)
+        Try
+            If e.ProgressPercentage > 0 Then
+                ProgressForm.prog_backupProg.Value = e.ProgressPercentage
             End If
-        End If
-        UpdateApp()
+        Catch ex As Exception
+            mainLogger.Log("Could not update percent, reason: " & ex.Message)
+        End Try
+        Dim userState As String() = e.UserState
+        Try
+            If Not IsNothing(e.UserState) Then
+                If userState(0) = "proccess" Then
+                    ProgressForm.lbl_currentProccess.Text = userState(1)
+                ElseIf userState(0) = "amount" Then
+                    ProgressForm.lbl_done.Text = userState(1)
+                ElseIf userState(0) = "current" Then
+                    ProgressForm.lbl_currentBackup.Text = userState(1)
+                End If
+            End If
+        Catch ex As Exception
+            mainLogger.Log("Could not update " & userState(0) & ", reason: " & ex.Message)
+        End Try
     End Sub
 
     Private Sub secondThread_RunWorkerCompleted(sender As Object, e As System.ComponentModel.RunWorkerCompletedEventArgs) Handles secondThread.RunWorkerCompleted
-        ProgressForm.lbl_currentProccess.Text = "Complete!"
+        ProgressForm.lbl_currentProccess.Text = "Completed in " & e.Result & " seconds"
         StartBackups()
         secondaryLogger.Log("Finished backup proccess")
-        ProgressForm.progress_bar_filled()
+        ProgressForm.ControlBox = True
     End Sub
 
     Private Sub lbx_backups_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lbx_backups.SelectedIndexChanged
@@ -392,6 +438,7 @@ Public Class Main
             nud_hours.Value = selected.BackupInvervalHour
             nud_minutes.Value = selected.BackupInvervalMinute
             nud_previousQuantity.Value = selected.PastVersions
+            ckbx_manual.Checked = selected.Manual
             btn_deleteBackup.Enabled = True
             btn_saveChanges.Enabled = True
             btn_startBackup.Enabled = True
@@ -404,6 +451,7 @@ Public Class Main
             toUpdate.BackupInvervalHour = nud_hours.Value
             toUpdate.BackupInvervalMinute = nud_minutes.Value
             toUpdate.PastVersions = nud_previousQuantity.Value
+            toUpdate.Manual = ckbx_manual.Checked
             backups(tbx_bkupName.Text) = toUpdate
             SaveBackup(tbx_bkupName.Text, toUpdate)
         End If
@@ -412,10 +460,10 @@ Public Class Main
     Private Sub btn_startBackup_Click(sender As Object, e As EventArgs) Handles btn_startBackup.Click
         If lbx_backups.SelectedItem <> "" Then
             Dim selected As BackupClass = backups(lbx_backups.SelectedItem)
-            QueueBackup(selected.OriginalLoc, selected.BackupLoc, selected.PastVersions)
+            QueueBackup(lbx_backups.SelectedItem, selected.OriginalLoc, selected.BackupLoc, selected.PastVersions)
             selected.CurrentIntervalHour = 0
             backups(lbx_backups.SelectedItem) = selected
-            mainLogger.Log("Queued and updated backup " & lbx_backups.SelectedItem)
+            mainLogger.Log("Queued and updated backup '" & lbx_backups.SelectedItem & "'")
         End If
     End Sub
 
@@ -428,5 +476,9 @@ Public Class Main
             showFormOnLaunch = ckbx_showWindow.Checked
             SaveOptions()
         End If
+    End Sub
+
+    Private Sub ckbx_manual_CheckedChanged(sender As Object, e As EventArgs) Handles ckbx_manual.CheckedChanged
+
     End Sub
 End Class

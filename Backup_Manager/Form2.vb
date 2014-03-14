@@ -16,7 +16,7 @@ Public Class BackupAdder
     Private Sub btn_addBackup_Click(sender As Object, e As EventArgs) Handles btn_addBackup.Click
         If Not backups.ContainsKey(tbx_bkupName.Text) Then
             If DirectoryExists(tbx_originalLoc.Text) And DirectoryExists(tbx_bkupLoc.Text) Then
-                Main.NewBackup(tbx_bkupName.Text, New BackupClass(tbx_originalLoc.Text, tbx_bkupLoc.Text, nud_hours.Value, nud_minutes.Value, nud_previousQuantity.Value, 0, 0))
+                Main.NewBackup(tbx_bkupName.Text, New BackupClass(tbx_originalLoc.Text, tbx_bkupLoc.Text, nud_hours.Value, nud_minutes.Value, nud_previousQuantity.Value, 0, 0, ckbx_manual.Checked))
                 Me.Close()
             Else
                 MessageBox.Show("1 or more of the specified folders don't exist!", "Invalid folder selection", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -45,6 +45,7 @@ Public Class BackupAdder
         nud_hours.Value = 1
         nud_minutes.Value = 0
         nud_previousQuantity.Value = 0
+        ckbx_manual.Checked = False
         mainLogger.Log("New backup form shown")
     End Sub
 End Class

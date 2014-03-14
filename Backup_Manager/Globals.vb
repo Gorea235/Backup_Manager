@@ -1,4 +1,5 @@
 ﻿Imports Microsoft.VisualBasic.FileIO.FileSystem
+Imports Logging
 Module Globals
     Friend Class BackupClass
         Public OriginalLoc As String
@@ -8,8 +9,9 @@ Module Globals
         Public CurrentIntervalHour As UInt32
         Public CurrentIntervalMinute As UInt32
         Public PastVersions As UInt32
+        Public Manual As Boolean
 
-        Public Sub New(ByVal sOriginalLoc As String, ByVal sBackupLoc As String, ByVal iBackupIntervalHour As UInt32, ByVal iBackupIntervalMinute As UInt32, ByVal iPastVersions As UInt32, ByVal iCurrentIntervalHour As UInt32, ByVal iCurrentIntervalMinute As UInt32)
+        Public Sub New(ByVal sOriginalLoc As String, ByVal sBackupLoc As String, ByVal iBackupIntervalHour As UInt32, ByVal iBackupIntervalMinute As UInt32, ByVal iPastVersions As UInt32, ByVal iCurrentIntervalHour As UInt32, ByVal iCurrentIntervalMinute As UInt32, ByVal bManual As Boolean)
             Me.OriginalLoc = sOriginalLoc
             Me.BackupLoc = sBackupLoc
             Me.BackupInvervalHour = iBackupIntervalHour
@@ -28,14 +30,11 @@ Module Globals
     Friend loadingComplete As Boolean = False
     Friend xDoc As XDocument
     Friend stopExecution As Boolean = False
-    Friend mainLogger As New Logger.Logger(LogLoc, "Main Thread:")
-    Friend secondaryLogger As New Logger.Logger(LogLoc, "Secondary Thread: ")
+    Friend mainLogger As New Logger(LogLoc, "Main Thread:")
+    Friend secondaryLogger As New Logger(LogLoc, "Secondary Thread: ")
     Friend backingup As Boolean = False
     Friend backups As Dictionary(Of String, BackupClass) = New Dictionary(Of String, BackupClass)
     Friend tmr_timer As New Timer
-    
-    Declare Function AllocConsole Lib "kernel32" () As Integer
-    Declare Function FreeConsole Lib "kernel32" () As Integer
 
     Sub New()
         tmr_timer.Enabled = False

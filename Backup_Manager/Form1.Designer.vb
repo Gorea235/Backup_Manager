@@ -50,6 +50,7 @@ Partial Class Main
         Me.btn_startBackup = New System.Windows.Forms.Button()
         Me.btn_deleteBackup = New System.Windows.Forms.Button()
         Me.ckbx_showWindow = New System.Windows.Forms.CheckBox()
+        Me.ckbx_manual = New System.Windows.Forms.CheckBox()
         CType(Me.nud_hours, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.notifyIcon_menustrip.SuspendLayout()
         CType(Me.nud_previousQuantity, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -274,11 +275,23 @@ Partial Class Main
         Me.ckbx_showWindow.Text = "Show window on launch"
         Me.ckbx_showWindow.UseVisualStyleBackColor = True
         '
+        'ckbx_manual
+        '
+        Me.ckbx_manual.AutoSize = True
+        Me.ckbx_manual.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ckbx_manual.Location = New System.Drawing.Point(178, 262)
+        Me.ckbx_manual.Name = "ckbx_manual"
+        Me.ckbx_manual.Size = New System.Drawing.Size(191, 21)
+        Me.ckbx_manual.TabIndex = 21
+        Me.ckbx_manual.Text = "Only run backup manually"
+        Me.ckbx_manual.UseVisualStyleBackColor = True
+        '
         'Main
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(642, 446)
+        Me.Controls.Add(Me.ckbx_manual)
         Me.Controls.Add(Me.ckbx_showWindow)
         Me.Controls.Add(Me.btn_deleteBackup)
         Me.Controls.Add(Me.btn_startBackup)
@@ -339,5 +352,6 @@ Partial Class Main
     Friend WithEvents btn_startBackup As System.Windows.Forms.Button
     Friend WithEvents btn_deleteBackup As System.Windows.Forms.Button
     Friend WithEvents ckbx_showWindow As System.Windows.Forms.CheckBox
+    Friend WithEvents ckbx_manual As System.Windows.Forms.CheckBox
 
 End Class

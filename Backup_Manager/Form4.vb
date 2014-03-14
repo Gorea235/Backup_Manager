@@ -9,7 +9,7 @@
     Private Sub btn_startBackups_Click(sender As Object, e As EventArgs) Handles btn_startBackups.Click
         For Each c In clbx_backups.CheckedItems
             Dim checked As BackupClass = backups(c)
-            Main.QueueBackup(checked.OriginalLoc, checked.BackupLoc, checked.PastVersions)
+            Main.QueueBackup(c, checked.OriginalLoc, checked.BackupLoc, checked.PastVersions)
         Next
         Me.Close()
     End Sub

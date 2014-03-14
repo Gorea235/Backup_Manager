@@ -8,10 +8,11 @@ D:\LukeData\Google Drive\Programs\Visual Studio\Backup_Manager\Backup_Manager\ob
 D:\LukeData\Google Drive\Programs\Visual Studio\Backup_Manager\Backup_Manager\obj\Debug\Backup_Manager.xml
 D:\LukeData\Google Drive\Programs\Visual Studio\Backup_Manager\Backup_Manager\obj\Debug\Backup_Manager.pdb
 D:\LukeData\Google Drive\Programs\Visual Studio\Backup_Manager\Backup_Manager\obj\Debug\Backup_Manager.Main.resources
-D:\LukeData\Google Drive\Programs\Visual Studio\Backup_Manager\Backup_Manager\bin\Debug\Logger.dll
 D:\LukeData\Google Drive\Programs\Visual Studio\Backup_Manager\Backup_Manager\obj\Debug\Backup_Manager.vbprojResolveAssemblyReference.cache
 D:\LukeData\Google Drive\Programs\Visual Studio\Backup_Manager\Backup_Manager\obj\Debug\Backup_Manager.BackupAdder.resources
 D:\LukeData\Google Drive\Programs\Visual Studio\Backup_Manager\Backup_Manager\obj\Debug\Backup_Manager.ProgressForm.resources
 D:\LukeData\Google Drive\Programs\Visual Studio\Backup_Manager\Backup_Manager\obj\Debug\Backup_Manager.BackupSelector.resources
 D:\LukeData\Google Drive\Programs\Visual Studio\Backup_Manager\Backup_Manager\obj\Debug\Interop.IWshRuntimeLibrary.dll
 D:\LukeData\Google Drive\Programs\Visual Studio\Backup_Manager\Backup_Manager\obj\Debug\Backup_Manager.vbproj.ResolveComReference.cache
+D:\LukeData\Google Drive\Programs\Visual Studio\Backup_Manager\Backup_Manager\bin\Debug\Logging.dll
+D:\LukeData\Google Drive\Programs\Visual Studio\Backup_Manager\Backup_Manager\obj\Debug\Interop.Shell32.dll

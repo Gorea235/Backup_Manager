@@ -40,6 +40,7 @@ Partial Class BackupAdder
         Me.btn_findBackup = New System.Windows.Forms.Button()
         Me.fbd_orignialLoc = New System.Windows.Forms.FolderBrowserDialog()
         Me.fbd_backupLoc = New System.Windows.Forms.FolderBrowserDialog()
+        Me.ckbx_manual = New System.Windows.Forms.CheckBox()
         CType(Me.nud_hours, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.nud_minutes, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.nud_previousQuantity, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -48,7 +49,7 @@ Partial Class BackupAdder
         'nud_hours
         '
         Me.nud_hours.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.nud_hours.Location = New System.Drawing.Point(15, 239)
+        Me.nud_hours.Location = New System.Drawing.Point(15, 225)
         Me.nud_hours.Name = "nud_hours"
         Me.nud_hours.Size = New System.Drawing.Size(40, 23)
         Me.nud_hours.TabIndex = 19
@@ -56,7 +57,7 @@ Partial Class BackupAdder
         'Label4
         '
         Me.Label4.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label4.Location = New System.Drawing.Point(12, 216)
+        Me.Label4.Location = New System.Drawing.Point(12, 202)
         Me.Label4.Name = "Label4"
         Me.Label4.Size = New System.Drawing.Size(734, 20)
         Me.Label4.TabIndex = 18
@@ -134,7 +135,7 @@ Partial Class BackupAdder
         'nud_minutes
         '
         Me.nud_minutes.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.nud_minutes.Location = New System.Drawing.Point(79, 240)
+        Me.nud_minutes.Location = New System.Drawing.Point(79, 226)
         Me.nud_minutes.Maximum = New Decimal(New Integer() {59, 0, 0, 0})
         Me.nud_minutes.Name = "nud_minutes"
         Me.nud_minutes.Size = New System.Drawing.Size(40, 23)
@@ -144,7 +145,7 @@ Partial Class BackupAdder
         '
         Me.Label6.AutoSize = True
         Me.Label6.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label6.Location = New System.Drawing.Point(61, 242)
+        Me.Label6.Location = New System.Drawing.Point(61, 228)
         Me.Label6.Name = "Label6"
         Me.Label6.Size = New System.Drawing.Size(12, 17)
         Me.Label6.TabIndex = 24
@@ -153,7 +154,7 @@ Partial Class BackupAdder
         'nud_previousQuantity
         '
         Me.nud_previousQuantity.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.nud_previousQuantity.Location = New System.Drawing.Point(15, 327)
+        Me.nud_previousQuantity.Location = New System.Drawing.Point(15, 293)
         Me.nud_previousQuantity.Name = "nud_previousQuantity"
         Me.nud_previousQuantity.Size = New System.Drawing.Size(731, 23)
         Me.nud_previousQuantity.TabIndex = 23
@@ -161,7 +162,7 @@ Partial Class BackupAdder
         'Label5
         '
         Me.Label5.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label5.Location = New System.Drawing.Point(12, 304)
+        Me.Label5.Location = New System.Drawing.Point(12, 270)
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(734, 20)
         Me.Label5.TabIndex = 22
@@ -193,11 +194,23 @@ Partial Class BackupAdder
         '
         Me.fbd_backupLoc.Description = "Select the folder to place the back in"
         '
+        'ckbx_manual
+        '
+        Me.ckbx_manual.AutoSize = True
+        Me.ckbx_manual.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ckbx_manual.Location = New System.Drawing.Point(12, 338)
+        Me.ckbx_manual.Name = "ckbx_manual"
+        Me.ckbx_manual.Size = New System.Drawing.Size(191, 21)
+        Me.ckbx_manual.TabIndex = 28
+        Me.ckbx_manual.Text = "Only run backup manually"
+        Me.ckbx_manual.UseVisualStyleBackColor = True
+        '
         'BackupAdder
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(758, 446)
+        Me.Controls.Add(Me.ckbx_manual)
         Me.Controls.Add(Me.btn_findBackup)
         Me.Controls.Add(Me.btn_findOriginal)
         Me.Controls.Add(Me.nud_minutes)
@@ -241,4 +254,5 @@ Partial Class BackupAdder
     Friend WithEvents btn_findBackup As System.Windows.Forms.Button
     Friend WithEvents fbd_orignialLoc As System.Windows.Forms.FolderBrowserDialog
     Friend WithEvents fbd_backupLoc As System.Windows.Forms.FolderBrowserDialog
+    Friend WithEvents ckbx_manual As System.Windows.Forms.CheckBox
 End Class
