@@ -97,12 +97,12 @@ Public Class Main
                 Dim tmpPastVersions As String = xDoc...<PastVersionsToKeep>.Value
                 Dim tmpManual As String = xDoc...<Manual>.Value
                 If tmpName <> "" And tmpOriginalLoc <> "" And tmpBackupLoc <> "" And tmpBackupIntervalHour <> "" And tmpBackupIntervalMinute <> "" And tmpCurrentIntervalHour <> "" And tmpCurrentIntervalMinute <> "" And tmpPastVersions <> "" And tmpManual <> "" Then
-                    backups.Add(tmpName, New BackupClass(tmpOriginalLoc, tmpBackupLoc, tmpBackupIntervalHour, tmpBackupIntervalMinute, tmpPastVersions, tmpCurrentIntervalHour, tmpCurrentIntervalMinute, tmpManual))
+                    backups.Add(tmpName, New BackupClass(tmpOriginalLoc, tmpBackupLoc, tmpBackupIntervalHour, tmpBackupIntervalMinute, tmpPastVersions, tmpCurrentIntervalHour, tmpCurrentIntervalMinute, CBool(tmpManual)))
                     mainLogger.Log("Loaded " & f & " as a backup xml file with data: Name=" & tmpName _
                                    & ",OriginalLocation=" & tmpOriginalLoc & ",BackupLocation=" & tmpBackupLoc & _
                                    ",BackupInterval=" & tmpBackupIntervalHour & ",PastVersions=" & tmpPastVersions & _
                                    ",CurrentIntervalHour=" & tmpCurrentIntervalHour & _
-                                   ",CurrentIntervalMinute=" & tmpCurrentIntervalMinute & ",Manual=" & tmpManual)
+                                   ",CurrentIntervalMinute=" & tmpCurrentIntervalMinute & ",Manual=" & CBool(tmpManual))
                 Else
                     mainLogger.Log("|" & f & "| wasn't loaded due to having an incorrect element struture")
                 End If
@@ -228,6 +228,8 @@ Public Class Main
             queued.Remove(queued.First.Key)
         End If
     End Sub
+
+#Region "Second thread work - backing up"
 
     Private Sub secondThread_DoWork(sender As Object, e As System.ComponentModel.DoWorkEventArgs) Handles secondThread.DoWork
         Dim args As queueClass
@@ -429,6 +431,8 @@ Public Class Main
         ProgressForm.ControlBox = True
     End Sub
 
+#End Region
+
     Private Sub lbx_backups_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lbx_backups.SelectedIndexChanged
         If lbx_backups.SelectedItem <> "" Then
             Dim selected As BackupClass = backups(lbx_backups.SelectedItem)
@@ -468,7 +472,13 @@ Public Class Main
     End Sub
 
     Private Sub btn_deleteBackup_Click(sender As Object, e As EventArgs) Handles btn_deleteBackup.Click
-
+        If lbx_backups.SelectedItem <> "" Then
+            DeleteFile(backupFilesLoc & "backup_" & lbx_backups.SelectedItem & ".xml")
+            LoadBackups()
+            btn_deleteBackup.Enabled = False
+            btn_saveChanges.Enabled = False
+            btn_startBackup.Enabled = False
+        End If
     End Sub
 
     Private Sub cbx_showWindow_CheckedChanged(sender As Object, e As EventArgs) Handles ckbx_showWindow.CheckedChanged
@@ -476,9 +486,5 @@ Public Class Main
             showFormOnLaunch = ckbx_showWindow.Checked
             SaveOptions()
         End If
-    End Sub
-
-    Private Sub ckbx_manual_CheckedChanged(sender As Object, e As EventArgs) Handles ckbx_manual.CheckedChanged
-
     End Sub
 End Class

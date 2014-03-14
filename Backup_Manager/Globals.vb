@@ -19,6 +19,7 @@ Module Globals
             Me.PastVersions = iPastVersions
             Me.CurrentIntervalHour = iCurrentIntervalHour
             Me.CurrentIntervalMinute = iCurrentIntervalMinute
+            Me.Manual = bManual
         End Sub
     End Class
     Friend Const mainDir As String = "C:/Backup_Manager/"
