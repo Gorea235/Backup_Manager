@@ -260,7 +260,7 @@ Public Class Main
         Dim backDir As String = ""
         Dim skips As UInt32 = 0
         Dim copies As UInt32 = 0
-        Dim errors As UInt32 = 0
+        Dim errors As New Stack
         Dim stopwatch As New Stopwatch
         stopwatch.Restart()
         While files.Count > 0
@@ -300,8 +300,7 @@ Public Class Main
                         End If
                         'secondaryLogger.Log("Backed up " & origFile & " to " & filebk)
                     Catch ex As Exception
-                        errors += 1
-                        secondaryLogger.Log("Didn't back up " & origFile & ", reason = " & ex.Message)
+                        errors.Push(ex.Message)
                     End Try
                 Else
                     skips += 1
@@ -317,7 +316,12 @@ Public Class Main
             UpdateQuantityLabel(Math.Round(amountDone / amount * 100, 2), amountDone, amount)
         End While
         stopwatch.Stop()
-        secondaryLogger.Log("Backup process complete with " & copies & " copies, " & skips & " skips and " & errors & " errors, with a total of " & amountDone & " / " & amount & " files checked in " & (stopwatch.ElapsedMilliseconds / 1000) & " seconds")
+        secondaryLogger.Log("Backup process complete with " & copies & " copies, " & skips & " skips and " & errors.Count & " errors, with a total of " & amountDone & " / " & amount & " files checked in " & (stopwatch.ElapsedMilliseconds / 1000) & " seconds")
+        If errors.Count > 0 Then
+            For Each ex As String In errors
+                secondaryLogger.Log("Didn't back up " & origFile & ", reason = " & ex)
+            Next
+        End If
         Return (stopwatch.ElapsedMilliseconds / 1000)
     End Function
 
@@ -466,7 +470,9 @@ Public Class Main
             Dim selected As BackupClass = backups(lbx_backups.SelectedItem)
             QueueBackup(lbx_backups.SelectedItem, selected.OriginalLoc, selected.BackupLoc, selected.PastVersions)
             selected.CurrentIntervalHour = 0
+            selected.CurrentIntervalMinute = 0
             backups(lbx_backups.SelectedItem) = selected
+            SaveBackup(lbx_backups.SelectedItem, selected)
             mainLogger.Log("Queued and updated backup '" & lbx_backups.SelectedItem & "'")
         End If
     End Sub
