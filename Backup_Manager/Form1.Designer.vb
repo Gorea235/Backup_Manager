@@ -51,6 +51,12 @@ Partial Class Main
         Me.btn_deleteBackup = New System.Windows.Forms.Button()
         Me.ckbx_showWindow = New System.Windows.Forms.CheckBox()
         Me.ckbx_manual = New System.Windows.Forms.CheckBox()
+        Me.Label7 = New System.Windows.Forms.Label()
+        Me.Label8 = New System.Windows.Forms.Label()
+        Me.tbx_currentHour = New System.Windows.Forms.TextBox()
+        Me.tbx_currentMinute = New System.Windows.Forms.TextBox()
+        Me.ckbx_debug = New System.Windows.Forms.CheckBox()
+        Me.lbl_currentStatus = New System.Windows.Forms.Label()
         CType(Me.nud_hours, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.notifyIcon_menustrip.SuspendLayout()
         CType(Me.nud_previousQuantity, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -286,11 +292,77 @@ Partial Class Main
         Me.ckbx_manual.Text = "Only run backup manually"
         Me.ckbx_manual.UseVisualStyleBackColor = True
         '
+        'Label7
+        '
+        Me.Label7.AutoSize = True
+        Me.Label7.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label7.Location = New System.Drawing.Point(210, 314)
+        Me.Label7.Name = "Label7"
+        Me.Label7.Size = New System.Drawing.Size(12, 17)
+        Me.Label7.TabIndex = 23
+        Me.Label7.Text = ":"
+        '
+        'Label8
+        '
+        Me.Label8.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label8.Location = New System.Drawing.Point(175, 286)
+        Me.Label8.Name = "Label8"
+        Me.Label8.Size = New System.Drawing.Size(455, 20)
+        Me.Label8.TabIndex = 22
+        Me.Label8.Text = "Current interval (hours:minutes):"
+        '
+        'tbx_currentHour
+        '
+        Me.tbx_currentHour.Enabled = False
+        Me.tbx_currentHour.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.tbx_currentHour.Location = New System.Drawing.Point(178, 311)
+        Me.tbx_currentHour.Name = "tbx_currentHour"
+        Me.tbx_currentHour.Size = New System.Drawing.Size(26, 23)
+        Me.tbx_currentHour.TabIndex = 24
+        '
+        'tbx_currentMinute
+        '
+        Me.tbx_currentMinute.Enabled = False
+        Me.tbx_currentMinute.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.tbx_currentMinute.Location = New System.Drawing.Point(228, 311)
+        Me.tbx_currentMinute.Name = "tbx_currentMinute"
+        Me.tbx_currentMinute.Size = New System.Drawing.Size(26, 23)
+        Me.tbx_currentMinute.TabIndex = 25
+        '
+        'ckbx_debug
+        '
+        Me.ckbx_debug.AutoSize = True
+        Me.ckbx_debug.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ckbx_debug.Location = New System.Drawing.Point(185, 413)
+        Me.ckbx_debug.Name = "ckbx_debug"
+        Me.ckbx_debug.Size = New System.Drawing.Size(69, 21)
+        Me.ckbx_debug.TabIndex = 26
+        Me.ckbx_debug.Text = "Debug"
+        Me.ckbx_debug.UseVisualStyleBackColor = True
+        '
+        'lbl_currentStatus
+        '
+        Me.lbl_currentStatus.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lbl_currentStatus.AutoSize = True
+        Me.lbl_currentStatus.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lbl_currentStatus.Location = New System.Drawing.Point(317, 344)
+        Me.lbl_currentStatus.Name = "lbl_currentStatus"
+        Me.lbl_currentStatus.Size = New System.Drawing.Size(101, 17)
+        Me.lbl_currentStatus.TabIndex = 27
+        Me.lbl_currentStatus.Text = "Current status:"
+        Me.lbl_currentStatus.TextAlign = System.Drawing.ContentAlignment.TopRight
+        '
         'Main
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(642, 446)
+        Me.Controls.Add(Me.lbl_currentStatus)
+        Me.Controls.Add(Me.ckbx_debug)
+        Me.Controls.Add(Me.tbx_currentMinute)
+        Me.Controls.Add(Me.tbx_currentHour)
+        Me.Controls.Add(Me.Label7)
+        Me.Controls.Add(Me.Label8)
         Me.Controls.Add(Me.ckbx_manual)
         Me.Controls.Add(Me.ckbx_showWindow)
         Me.Controls.Add(Me.btn_deleteBackup)
@@ -353,5 +425,11 @@ Partial Class Main
     Friend WithEvents btn_deleteBackup As System.Windows.Forms.Button
     Friend WithEvents ckbx_showWindow As System.Windows.Forms.CheckBox
     Friend WithEvents ckbx_manual As System.Windows.Forms.CheckBox
+    Friend WithEvents Label7 As System.Windows.Forms.Label
+    Friend WithEvents Label8 As System.Windows.Forms.Label
+    Friend WithEvents tbx_currentHour As System.Windows.Forms.TextBox
+    Friend WithEvents tbx_currentMinute As System.Windows.Forms.TextBox
+    Friend WithEvents ckbx_debug As System.Windows.Forms.CheckBox
+    Friend WithEvents lbl_currentStatus As System.Windows.Forms.Label
 
 End Class

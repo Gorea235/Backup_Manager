@@ -37,6 +37,7 @@ Partial Class ProgressForm
         Me.prog_backupProg.Location = New System.Drawing.Point(15, 119)
         Me.prog_backupProg.Name = "prog_backupProg"
         Me.prog_backupProg.Size = New System.Drawing.Size(589, 28)
+        Me.prog_backupProg.Style = System.Windows.Forms.ProgressBarStyle.Continuous
         Me.prog_backupProg.TabIndex = 0
         '
         'Label1

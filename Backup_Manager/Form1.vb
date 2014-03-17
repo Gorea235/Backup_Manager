@@ -2,6 +2,7 @@
 Imports System.IO
 Imports IWshRuntimeLibrary
 Imports System.Environment
+Imports Microsoft.WindowsAPICodePack.Taskbar
 Public Class Main
     Private Class queueClass
         Public name As String
@@ -41,6 +42,7 @@ Public Class Main
         LoadOptions()
         ckbx_startOnBoot.Checked = startOnBoot
         ckbx_showWindow.Checked = showFormOnLaunch
+        ckbx_debug.Checked = debugMode
         LoadBackups()
         CheckShortCut()
         mainLogger.Log("Setup complete")
@@ -196,7 +198,9 @@ Public Class Main
                     v.CurrentIntervalMinute = 0
                     v.CurrentIntervalHour += 1
                 End If
-                mainLogger.Log("Increased CurrentInvervalMinute on backup " & k & " (to " & v.CurrentIntervalMinute & "), CurrentIntervalHour = " & v.CurrentIntervalHour)
+                If debugMode Then
+                    mainLogger.Log("Increased CurrentInvervalMinute on backup " & k & " (to " & v.CurrentIntervalMinute & "), CurrentIntervalHour = " & v.CurrentIntervalHour)
+                End If
                 If v.CurrentIntervalMinute = v.BackupInvervalMinute And v.CurrentIntervalHour = v.BackupInvervalHour Then
                     QueueBackup(k, v.OriginalLoc, v.BackupLoc, v.PastVersions)
                     v.CurrentIntervalHour = 0
@@ -205,6 +209,10 @@ Public Class Main
                 End If
                 backups(k) = v
                 SaveBackup(k, v, False)
+                If lbx_backups.SelectedItem = k Then
+                    tbx_currentHour.Text = v.CurrentIntervalHour
+                    tbx_currentMinute.Text = v.CurrentIntervalMinute
+                End If
             End If
         Next
     End Sub
@@ -215,6 +223,7 @@ Public Class Main
 
     Public Sub QueueBackup(ByVal name As String, ByVal originalLoc As String, ByVal backupLoc As String, ByVal pastVersions As Integer)
         queued.Add(queued.Count, New queueClass(name, originalLoc, backupLoc, pastVersions))
+        UpdateStatusText()
         mainLogger.Log("Backup added to queue list")
         If Not secondThread.IsBusy Then
             StartBackups()
@@ -260,7 +269,7 @@ Public Class Main
         Dim backDir As String = ""
         Dim skips As UInt32 = 0
         Dim copies As UInt32 = 0
-        Dim errors As New Stack
+        Dim errors As New Stack(Of String)
         Dim stopwatch As New Stopwatch
         stopwatch.Restart()
         While files.Count > 0
@@ -300,7 +309,7 @@ Public Class Main
                         End If
                         'secondaryLogger.Log("Backed up " & origFile & " to " & filebk)
                     Catch ex As Exception
-                        errors.Push(ex.Message)
+                        errors.Push("Didn't back up " & origFile & ", reason = " & ex.Message)
                     End Try
                 Else
                     skips += 1
@@ -319,7 +328,7 @@ Public Class Main
         secondaryLogger.Log("Backup process complete with " & copies & " copies, " & skips & " skips and " & errors.Count & " errors, with a total of " & amountDone & " / " & amount & " files checked in " & (stopwatch.ElapsedMilliseconds / 1000) & " seconds")
         If errors.Count > 0 Then
             For Each ex As String In errors
-                secondaryLogger.Log("Didn't back up " & origFile & ", reason = " & ex)
+                secondaryLogger.Log(ex)
             Next
         End If
         Return (stopwatch.ElapsedMilliseconds / 1000)
@@ -408,6 +417,7 @@ Public Class Main
         Try
             If e.ProgressPercentage > 0 Then
                 ProgressForm.prog_backupProg.Value = e.ProgressPercentage
+                TaskbarManager.Instance.SetProgressValue(e.ProgressPercentage, 100)
             End If
         Catch ex As Exception
             mainLogger.Log("Could not update percent, reason: " & ex.Message)
@@ -421,6 +431,11 @@ Public Class Main
                     ProgressForm.lbl_done.Text = userState(1)
                 ElseIf userState(0) = "current" Then
                     ProgressForm.lbl_currentBackup.Text = userState(1)
+                    currentBackup = userState(1)
+                    ProgressForm.ControlBox = False
+                    ProgressForm.prog_backupProg.Value = 0
+                    UpdateStatusText()
+                    TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal)
                 End If
             End If
         Catch ex As Exception
@@ -430,12 +445,37 @@ Public Class Main
 
     Private Sub secondThread_RunWorkerCompleted(sender As Object, e As System.ComponentModel.RunWorkerCompletedEventArgs) Handles secondThread.RunWorkerCompleted
         ProgressForm.lbl_currentProccess.Text = "Completed in " & e.Result & " seconds"
+        currentBackup = ""
         StartBackups()
         secondaryLogger.Log("Finished backup proccess")
-        ProgressForm.ControlBox = True
+        If queued.Count > 0 Then
+            Threading.Thread.Sleep(3000)
+        Else
+            ProgressForm.ControlBox = True
+        End If
+        UpdateStatusText()
+        TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress)
     End Sub
 
 #End Region
+
+    Private Sub UpdateStatusText()
+        Dim prefix As String = "Current status: "
+        Dim text As String = Nothing
+        If currentBackup = lbx_backups.SelectedItem Then
+            text = "Backing up"
+        Else
+            For Each q In queued.Values
+                If q.name = lbx_backups.SelectedItem Then
+                    text = "Queued for backup"
+                End If
+            Next
+        End If
+        If text = Nothing Then
+            text = "Idle"
+        End If
+        lbl_currentStatus.Text = prefix & text
+    End Sub
 
     Private Sub lbx_backups_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lbx_backups.SelectedIndexChanged
         If lbx_backups.SelectedItem <> "" Then
@@ -447,6 +487,9 @@ Public Class Main
             nud_minutes.Value = selected.BackupInvervalMinute
             nud_previousQuantity.Value = selected.PastVersions
             ckbx_manual.Checked = selected.Manual
+            tbx_currentHour.Text = selected.CurrentIntervalHour
+            tbx_currentMinute.Text = selected.CurrentIntervalMinute
+            UpdateStatusText()
             btn_deleteBackup.Enabled = True
             btn_saveChanges.Enabled = True
             btn_startBackup.Enabled = True
@@ -490,6 +533,13 @@ Public Class Main
     Private Sub cbx_showWindow_CheckedChanged(sender As Object, e As EventArgs) Handles ckbx_showWindow.CheckedChanged
         If showFormOnLaunch <> ckbx_showWindow.Checked Then
             showFormOnLaunch = ckbx_showWindow.Checked
+            SaveOptions()
+        End If
+    End Sub
+
+    Private Sub ckbx_debug_CheckedChanged(sender As Object, e As EventArgs) Handles ckbx_debug.CheckedChanged
+        If debugMode <> ckbx_debug.Checked Then
+            debugMode = ckbx_debug.Checked
             SaveOptions()
         End If
     End Sub

@@ -28,23 +28,21 @@ Module Globals
     Friend Const LogLoc As String = mainDir & "MainLog.log"
     Friend startOnBoot As Boolean = True
     Friend showFormOnLaunch As Boolean = True
+    Friend debugMode As Boolean = False
     Friend loadingComplete As Boolean = False
     Friend xDoc As XDocument
     Friend stopExecution As Boolean = False
-    Friend mainLogger As New Logger(LogLoc, "Main Thread:")
+    Friend mainLogger As New Logger(LogLoc, "Main Thread: ")
     Friend secondaryLogger As New Logger(LogLoc, "Secondary Thread: ")
-    Friend backingup As Boolean = False
+    Friend currentBackup As String = ""
     Friend backups As Dictionary(Of String, BackupClass) = New Dictionary(Of String, BackupClass)
     Friend tmr_timer As New Timer
-
-    Sub New()
-        tmr_timer.Enabled = False
-    End Sub
 
     Friend Sub SaveOptions()
         xDoc = New XDocument(New XElement("Options", _
                                           New XElement("StartOnBoot", startOnBoot), _
-                                          New XElement("ShowFormOnLaunch", showFormOnLaunch) _
+                                          New XElement("ShowFormOnLaunch", showFormOnLaunch), _
+                                          New XElement("DebugMode", debugMode) _
                                           ))
         xDoc.Save(optionsLoc)
         mainLogger.Log("Options saved")
@@ -56,9 +54,11 @@ Module Globals
         Try
             startOnBoot = If(xDoc...<StartOnBoot>.Value = "", True, xDoc...<StartOnBoot>.Value)
             showFormOnLaunch = If(xDoc...<ShowFormOnLaunch>.Value = "", True, xDoc...<ShowFormOnLaunch>.Value)
+            debugMode = If(xDoc...<DebugMode>.Value = "", False, xDoc...<DebugMode>.Value)
         Catch ex As Exception
             startOnBoot = True
             showFormOnLaunch = True
+            debugMode = False
             mainLogger.Log("Options failed to load, using defaults")
         End Try
         mainLogger.Log("Options loaded")
@@ -72,22 +72,4 @@ Module Globals
     Function GetLocalPath(ByVal location As String, ByVal actualDir As String)
         Return Right(location, location.Length - actualDir.Length)
     End Function
-
-    Friend Sub UpdateApp()
-        Main.Update()
-        BackupAdder.Update()
-        ProgressForm.Update()
-        BackupSelector.Update()
-        Application.DoEvents()
-    End Sub
-
-    Friend Sub wait(ByVal milliseconds As UInt32)
-        Dim sw As New Stopwatch
-        sw.Reset()
-        sw.Start()
-        While sw.ElapsedMilliseconds < milliseconds
-            UpdateApp()
-        End While
-        sw.Stop()
-    End Sub
 End Module

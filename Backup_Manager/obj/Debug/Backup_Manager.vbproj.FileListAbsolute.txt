@@ -16,3 +16,5 @@ D:\LukeData\Google Drive\Programs\Visual Studio\Backup_Manager\Backup_Manager\ob
 D:\LukeData\Google Drive\Programs\Visual Studio\Backup_Manager\Backup_Manager\obj\Debug\Backup_Manager.vbproj.ResolveComReference.cache
 D:\LukeData\Google Drive\Programs\Visual Studio\Backup_Manager\Backup_Manager\bin\Debug\Logging.dll
 D:\LukeData\Google Drive\Programs\Visual Studio\Backup_Manager\Backup_Manager\obj\Debug\Interop.Shell32.dll
+D:\LukeData\Google Drive\Programs\Visual Studio\Backup_Manager\Backup_Manager\bin\Debug\Microsoft.WindowsAPICodePack.dll
+D:\LukeData\Google Drive\Programs\Visual Studio\Backup_Manager\Backup_Manager\bin\Debug\Microsoft.WindowsAPICodePack.Shell.dll
