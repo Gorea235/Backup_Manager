@@ -18,3 +18,4 @@ D:\LukeData\Google Drive\Programs\Visual Studio\Backup_Manager\Backup_Manager\bi
 D:\LukeData\Google Drive\Programs\Visual Studio\Backup_Manager\Backup_Manager\obj\Debug\Interop.Shell32.dll
 D:\LukeData\Google Drive\Programs\Visual Studio\Backup_Manager\Backup_Manager\bin\Debug\Microsoft.WindowsAPICodePack.dll
 D:\LukeData\Google Drive\Programs\Visual Studio\Backup_Manager\Backup_Manager\bin\Debug\Microsoft.WindowsAPICodePack.Shell.dll
+D:\LukeData\Google Drive\Programs\Visual Studio\Backup_Manager\Backup_Manager\obj\Debug\Backup_Manager.backupResultsForm.resources

@@ -10,7 +10,8 @@ Public Class Main
         Public backupLoc As String
         Public pastVersions As Integer
 
-        Public Sub New(ByVal Name As String, ByVal OriginalLocation As String, ByVal BackupLocation As String, ByVal VersionsToKeep As Integer)
+        Public Sub New(ByVal Name As String, ByVal OriginalLocation As String, ByVal BackupLocation As String,
+                       ByVal VersionsToKeep As Integer)
             Me.name = Name
             Me.originalLoc = OriginalLocation
             Me.backupLoc = BackupLocation
@@ -18,6 +19,27 @@ Public Class Main
         End Sub
     End Class
     Private queued As Dictionary(Of Integer, queueClass) = New Dictionary(Of Integer, queueClass)
+    Friend Class backupResultClass
+        Public backupName As String
+        Public filesFound As Integer
+        Public fileFindTime As Single
+        Public fileBackupTime As Single
+        Public skips As Integer
+        Public copies As Integer
+        Public errors As Integer
+
+        Public Sub New(ByVal name As String, ByVal found As Integer, ByVal findTime As Single, ByVal backupTime As Single,
+                       ByVal skips As Integer, ByVal copies As Integer, ByVal errors As Integer)
+            Me.backupName = name
+            Me.filesFound = found
+            Me.fileFindTime = findTime
+            Me.fileBackupTime = backupTime
+            Me.skips = skips
+            Me.copies = copies
+            Me.errors = errors
+        End Sub
+    End Class
+    Friend backupResults As backupResultClass
 
     Public Sub New()
 
@@ -121,11 +143,7 @@ Public Class Main
 
     Friend Sub NewBackup(ByVal name As String, ByVal backupData As BackupClass)
         CreateBackup(name, backupData)
-        mainLogger.Log("Created new backup '" & "backup_" & name & ".xml" & "' with data: Name=" & name & _
-                       ",OriginalLocation=" & backupData.OriginalLoc & ",BackupLocation=" & backupData.BackupLoc & _
-                       ",BackupIntervalHour=" & backupData.BackupInvervalHour & ",BackupIntervalMinute=" & backupData.BackupInvervalMinute & _
-                       ",PastVersions=" & backupData.PastVersions & ",CurrentIntervalHour=" & backupData.CurrentIntervalHour & _
-                       ",CurrentIntervalMinute=" & backupData.CurrentIntervalMinute & ",Manual=" & backupData.Manual)
+        mainLogger.Log("Created new backup '" & BackupDataString(backupData))
         LoadBackups()
     End Sub
 
@@ -135,13 +153,17 @@ Public Class Main
         End If
         CreateBackup(name, backupData)
         If log = True Then
-            mainLogger.Log("Saved backup '" & "backup_" & name & ".xml" & "' with data: Name=" & name & _
-                           ",OriginalLocation=" & backupData.OriginalLoc & ",BackupLocation=" & backupData.BackupLoc & _
-                           ",BackupIntervalHour=" & backupData.BackupInvervalHour & ",BackupIntervalMinute=" & backupData.BackupInvervalMinute & _
-                           ",PastVersions=" & backupData.PastVersions & ",CurrentIntervalHour=" & backupData.CurrentIntervalHour & _
-                           ",CurrentIntervalMinute=" & backupData.CurrentIntervalMinute & ",Manual=" & backupData.Manual)
+            mainLogger.Log("Saved backup '" & BackupDataString(backupData))
         End If
     End Sub
+
+    Private Function BackupDataString(ByVal backupData As BackupClass) As String
+        Return "backup_" & Name & ".xml" & "' with data: Name=" & Name & _
+                ",OriginalLocation=" & backupData.OriginalLoc & ",BackupLocation=" & backupData.BackupLoc & _
+                ",BackupIntervalHour=" & backupData.BackupInvervalHour & ",BackupIntervalMinute=" & backupData.BackupInvervalMinute & _
+                ",PastVersions=" & backupData.PastVersions & ",CurrentIntervalHour=" & backupData.CurrentIntervalHour & _
+                ",CurrentIntervalMinute=" & backupData.CurrentIntervalMinute & ",Manual=" & backupData.Manual
+    End Function
 
     Friend Sub CreateBackup(ByVal name As String, ByVal backupData As BackupClass)
         xDoc = New XDocument(New XElement("Backup", _
@@ -248,6 +270,10 @@ Public Class Main
             Throw New ArgumentException("Argument couldn't be converted to queueClass")
             Exit Sub
         End Try
+        If Not DirectoryExists(args.originalLoc) Then
+            secondThread.ReportProgress(0, {"orig-missing", "Original Directory doesn't exist"})
+            Exit Sub
+        End If
         secondThread.ReportProgress(0, {"proccess", "Getting amount of files in backup"})
         secondThread.ReportProgress(0, {"current", args.name})
         Dim seconds As UInt32 = 0
@@ -257,10 +283,12 @@ Public Class Main
         Dim amountDone As New UInt32
         secondThread.ReportProgress(0, {"proccess", "Backing up files"})
         secondaryLogger.Log("Starting backup process with backup data '" & args.name & "'")
-        e.Result = BackupFolder(args.originalLoc, args.backupLoc, args.pastVersions, amount, files) + seconds
+        e.Result = BackupFolder(args.originalLoc, args.backupLoc, args.pastVersions, amount, files, args.name, seconds) + seconds
     End Sub
 
-    Private Function BackupFolder(ByVal originalLoc As String, ByVal backupLoc As String, ByVal pastVersions As Integer, ByVal amount As UInt32, ByVal files As Stack(Of String))
+    Private Function BackupFolder(ByVal originalLoc As String, ByVal backupLoc As String, ByVal pastVersions As Integer,
+                                  ByVal amount As UInt32, ByVal files As Stack(Of String), ByVal backupName As String,
+                                  ByVal findTime As UInteger) As Single
         Dim file1 As FileInfo
         Dim file2 As FileInfo
         Dim filebk As String = ""
@@ -331,6 +359,7 @@ Public Class Main
                 secondaryLogger.Log(ex)
             Next
         End If
+        backupResults = New backupResultClass(backupName, amount, findTime, (stopwatch.ElapsedMilliseconds / 1000), skips, copies, errors.Count)
         Return (stopwatch.ElapsedMilliseconds / 1000)
     End Function
 
@@ -436,6 +465,8 @@ Public Class Main
                     ProgressForm.prog_backupProg.Value = 0
                     UpdateStatusText()
                     TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal)
+                ElseIf userState(0) = "orig-missing" Then
+                    secondaryLogger.Log(userState(1))
                 End If
             End If
         Catch ex As Exception
@@ -446,6 +477,9 @@ Public Class Main
     Private Sub secondThread_RunWorkerCompleted(sender As Object, e As System.ComponentModel.RunWorkerCompletedEventArgs) Handles secondThread.RunWorkerCompleted
         ProgressForm.lbl_currentProccess.Text = "Completed in " & e.Result & " seconds"
         currentBackup = ""
+        backupResultsForm.dgv_results.Rows.Add(backupResults.backupName, backupResults.filesFound, backupResults.fileFindTime,
+                                               backupResults.fileBackupTime, backupResults.skips, backupResults.copies, backupResults.errors)
+        backupResultsForm.Show()
         StartBackups()
         secondaryLogger.Log("Finished backup proccess")
         If queued.Count > 0 Then
@@ -514,6 +548,8 @@ Public Class Main
             QueueBackup(lbx_backups.SelectedItem, selected.OriginalLoc, selected.BackupLoc, selected.PastVersions)
             selected.CurrentIntervalHour = 0
             selected.CurrentIntervalMinute = 0
+            nud_hours.Value = selected.BackupInvervalHour
+            nud_minutes.Value = selected.BackupInvervalMinute
             backups(lbx_backups.SelectedItem) = selected
             SaveBackup(lbx_backups.SelectedItem, selected)
             mainLogger.Log("Queued and updated backup '" & lbx_backups.SelectedItem & "'")
